@@ -16,7 +16,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
     private var numVertices: Int
 
     init {
-        // Генерация координат вершин и текстурных координат для сферы
         val vertices = ArrayList<Float>()
         val textureCoords = ArrayList<Float>()
 
@@ -34,7 +33,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
                 val x = cos(lng).toFloat()
                 val y = sin(lng).toFloat()
 
-                // Вершины для текущей и следующей полосы
                 vertices.add(x * zr0)
                 vertices.add(y * zr0)
                 vertices.add(z0)
@@ -43,7 +41,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
                 vertices.add(y * zr1)
                 vertices.add(z1)
 
-                // Текстурные координаты для каждой вершины
                 textureCoords.add(j.toFloat() / slices)
                 textureCoords.add(1 - (i.toFloat() / stacks))
 
@@ -55,7 +52,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
 
         numVertices = vertices.size / 3
 
-        // Создание буферов для вершин и текстур
         val bb = ByteBuffer.allocateDirect(vertices.size * 4)
         bb.order(ByteOrder.nativeOrder())
         vertexBuffer = bb.asFloatBuffer().apply {
@@ -70,7 +66,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
             position(0)
         }
 
-        // Создание шейдеров
         val vertexShaderCode = """
             uniform mat4 uMVPMatrix;
             attribute vec4 vPosition;
@@ -104,21 +99,17 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
     fun draw(mvpMatrix: FloatArray) {
         GLES20.glUseProgram(program)
 
-        // Установка вершин
         val positionHandle = GLES20.glGetAttribLocation(program, "vPosition")
         GLES20.glEnableVertexAttribArray(positionHandle)
         GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer)
 
-        // Установка текстурных координат
         val texCoordHandle = GLES20.glGetAttribLocation(program, "aTexCoord")
         GLES20.glEnableVertexAttribArray(texCoordHandle)
         GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 8, textureBuffer)
 
-        // Установка матрицы преобразования
         val mvpMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
 
-        // Установка текстуры
         val textureHandle = GLES20.glGetUniformLocation(program, "uTexture")
         GLES20.glUniform1i(textureHandle, 0)
 
@@ -128,7 +119,6 @@ class Sphere(private val textureId: Int, private val radius: Float = 1.0f, priva
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, numVertices)
 
-        // Отключение атрибутов
         GLES20.glDisableVertexAttribArray(positionHandle)
         GLES20.glDisableVertexAttribArray(texCoordHandle)
     }

@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mobiledevelopmentsecondkurs.ui.theme.MobileDevelopmentSecondKursTheme
 import com.example.presentation.ui.MoonGLSurfaceView
 import com.example.presentation.ui.MyGLSurfaceView
+import com.example.presentation.ui.NeptuneGLSurfaceView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +83,7 @@ fun MenuScreen(navController: NavController) {
 fun Lab2Screen(navController: NavController) {
     val context = LocalContext.current
     val glSurfaceView = remember { MyGLSurfaceView(context) }
-    val planetsList = listOf("Меркурий", "Венера", "Земля", "Луна", "Марс", "Юпитер", "Сатурн", "Уран")
+    val planetsList = listOf("Меркурий", "Венера", "Земля", "Луна", "Марс", "Юпитер", "Сатурн", "Уран", "Нептун")
     val planetInfoMap = mapOf(
         "Меркурий" to Pair("Меркурий — самая маленькая планета в нашей Солнечной системе.", R.drawable.mercury_texture),
         "Венера" to Pair("Венера имеет густую, токсичную атмосферу.", R.drawable.venus_texture),
@@ -91,7 +92,8 @@ fun Lab2Screen(navController: NavController) {
         "Марс" to Pair("Марс известен как Красная планета.", R.drawable.mars_texture),
         "Юпитер" to Pair("Юпитер — самая большая планета Солнечной системы.", R.drawable.jupiter_texture),
         "Сатурн" to Pair("Сатурн известен своей системой колец.", R.drawable.saturn_texture),
-        "Уран" to Pair("Уран вращается на боку.", R.drawable.uranus_texture)
+        "Уран" to Pair("Уран вращается на боку.", R.drawable.uranus_texture),
+        "Нептун" to Pair("Нептун самая дальняя планета солнечной системы", R.drawable.neptune_texture)
     )
 
     var currentPlanetIndex by remember { mutableStateOf(2) }
@@ -125,7 +127,11 @@ fun Lab2Screen(navController: NavController) {
     if (showDialog) {
         if (selectedPlanet == "Луна") {
             MoonDetailScreen(onDismiss = { showDialog = false })
-        } else {
+        }
+        else if(selectedPlanet == "Нептун") {
+            NeptuneDetailScreen(onDismiss = { showDialog = false })
+        }
+        else {
             val (planetInfo, planetImageRes) = planetInfoMap[selectedPlanet] ?: "Информация недоступна" to R.drawable.earth_texture
             PlanetInfoDialog(
                 planetName = selectedPlanet,
@@ -203,6 +209,51 @@ fun MoonDetailScreen(onDismiss: () -> Unit) {
                 Text(
                     text = "Луна — единственный естественный спутник Земли. " +
                             "Она влияет на приливы и отливы и является объектом изучения многих космических миссий.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = onDismiss) {
+                    Text("Назад")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NeptuneDetailScreen(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val moonGLSurfaceView = remember { NeptuneGLSurfaceView(context) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "", style = MaterialTheme.typography.headlineMedium)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AndroidView(factory = { moonGLSurfaceView }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Описание Луны
+                Text(
+                    text = "Нептун самая дальняя планета солнечной системы",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White,
                     modifier = Modifier.padding(16.dp)
